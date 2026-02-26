@@ -4,13 +4,14 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class Conexion {
+
     private Connection laConexion;
 
-    public Conexion() throws Exception{
+    public Conexion() throws Exception {
         Class.forName("com.mysql.cj.jdbc.Driver");
-        this.laConexion=DriverManager.getConnection("jdbc:mysql://localhost:3306/tienda","daw2","1234");
+        this.laConexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/tienda", "daw2", "1234");
     }
-        
+
     public int comprobarUsuario(String username, String pass) throws Exception {
         // Consulta para seleccionar el usuario con su contraseña y estado de admin
         String consulta = "SELECT * FROM usuarios WHERE nombreUser=? AND password=?";
@@ -46,18 +47,17 @@ public class Conexion {
         }
         return 0; // El usuario no existe
     }
-    
-   
-    public ArrayList<Consola> infoConsola()throws Exception {
+
+    public ArrayList<Consola> infoConsola() throws Exception {
         ArrayList<Consola> consolas = new ArrayList<>();
-         
+
         String consulta = "SELECT * FROM consolas";
-        
+
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta,
                 ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        
+
         ResultSet elResultado = elStatementPreparado.executeQuery();
-        
+
         while (elResultado.next()) {
             // Obtener los valores de las columnas
             int idConsola = elResultado.getInt("id_consola");
@@ -68,86 +68,83 @@ public class Conexion {
             int precio = elResultado.getInt("precio");
             int unidades = elResultado.getInt("unidades");
             int generacion = elResultado.getInt("generacion");
-            
+
             Consola consola = new Consola(idConsola, nombre, potenciaCpu, potenciaGpu, compania, precio, unidades, generacion);
             consolas.add(consola);
         }
-        
+
         elStatementPreparado.close();
         elResultado.close();
-        
+
         return consolas; // Devolver la lista de consolas
     }
-    
-    
+
     public ArrayList<Juego> infoxconsola(String consola) throws Exception {
         ArrayList<Juego> juegos = new ArrayList<>();
-    
+
         String consulta = "SELECT * FROM juegos j INNER JOIN juego_consola jc ON j.id_juego = jc.id_juego INNER JOIN consolas c ON jc.id_consola = c.id_consola WHERE c.nombre = ?;";
-        
+
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta,
                 ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        
+
         elStatementPreparado.setString(1, consola);
 
         ResultSet elResultado = elStatementPreparado.executeQuery();
-        
+
         while (elResultado.next()) {
-            int idJuego= elResultado.getInt("id_juego");
+            int idJuego = elResultado.getInt("id_juego");
             String nombre = elResultado.getString("nombre");
             String compania = elResultado.getString("compania_desarrolladora");
             String genero = elResultado.getString("genero");
             int puntuacion = elResultado.getInt("puntuacion_metacritic");
             int precio = elResultado.getInt("precio");
             int unidades = elResultado.getInt("unidades_disponibles");
-            
-            Juego juego=new Juego(idJuego, nombre, compania, genero, puntuacion, precio, unidades);
+
+            Juego juego = new Juego(idJuego, nombre, compania, genero, puntuacion, precio, unidades);
             juegos.add(juego);
         }
-        
+
         elStatementPreparado.close();
         elResultado.close();
-    
+
         return juegos;
     }
-    
-    
-    public ArrayList<Juego> infoJuegos()throws Exception {
+
+    public ArrayList<Juego> infoJuegos() throws Exception {
         ArrayList<Juego> juegos = new ArrayList<>();
-         
+
         String consulta = "SELECT * FROM juegos";
-        
+
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta,
                 ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        
+
         ResultSet elResultado = elStatementPreparado.executeQuery();
-        
+
         while (elResultado.next()) {
-            int idJuego= elResultado.getInt("id_juego");
+            int idJuego = elResultado.getInt("id_juego");
             String nombre = elResultado.getString("nombre");
             String compania = elResultado.getString("compania_desarrolladora");
             String genero = elResultado.getString("genero");
             int puntuacion = elResultado.getInt("puntuacion_metacritic");
             int precio = elResultado.getInt("precio");
             int unidades = elResultado.getInt("unidades_disponibles");
-            
-            Juego juego=new Juego(idJuego, nombre, compania, genero, puntuacion, precio, unidades);
+
+            Juego juego = new Juego(idJuego, nombre, compania, genero, puntuacion, precio, unidades);
             juegos.add(juego);
         }
-        
+
         elStatementPreparado.close();
         elResultado.close();
-        
+
         return juegos; // Devolver la lista de consolas
     }
-    
-    
-    public boolean insertarConsola(Consola consola) throws SQLException{
-        
-        String consulta="INSERT INTO consolas (id_consola, nombre, potencia_cpu, potencia_gpu, compania, precio, unidades, generacion) "
+
+    public boolean insertarConsola(Consola consola) throws SQLException {
+
+        String consulta = "INSERT INTO consolas (id_consola, nombre, potencia_cpu, potencia_gpu, compania, precio, unidades, generacion) "
                 + "VALUES(?,?,?,?,?,?,?,?)";
-        
-        PreparedStatement elStatementPreparado=this.laConexion.prepareStatement(consulta);
+
+        PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta);
         elStatementPreparado.setInt(1, consola.getIdConsola());
         elStatementPreparado.setString(2, consola.getNombre());
         elStatementPreparado.setString(3, consola.getCpu());
@@ -162,13 +159,13 @@ public class Conexion {
         elStatementPreparado.close();
         return true;
     }
-    
-    public boolean insertarJuego(Juego juego) throws SQLException{
-        
-        String consulta="INSERT INTO juegos (id_juego, nombre, compania_desarrolladora, genero, puntuacion_metacritic, precio, unidades_disponibles) "
+
+    public boolean insertarJuego(Juego juego) throws SQLException {
+
+        String consulta = "INSERT INTO juegos (id_juego, nombre, compania_desarrolladora, genero, puntuacion_metacritic, precio, unidades_disponibles) "
                 + "VALUES(?,?,?,?,?,?,?)";
-        
-        PreparedStatement elStatementPreparado=this.laConexion.prepareStatement(consulta);
+
+        PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta);
         elStatementPreparado.setInt(1, juego.getId());
         elStatementPreparado.setString(2, juego.getNombre());
         elStatementPreparado.setString(3, juego.getCompania());
@@ -182,50 +179,49 @@ public class Conexion {
         elStatementPreparado.close();
         return true;
     }
-    
-    
-    public ArrayList<Consola> obtenerNombreConsolas() throws SQLException{
+
+    public ArrayList<Consola> obtenerNombreConsolas() throws SQLException {
         ArrayList<Consola> consolas = new ArrayList<>();
-         
+
         String consulta = "SELECT id_consola, nombre nombre FROM consolas";
-        
+
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta,
                 ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        
+
         ResultSet elResultado = elStatementPreparado.executeQuery();
-        
+
         while (elResultado.next()) {
             int id = elResultado.getInt("id_consola");
             String nombre = elResultado.getString("nombre");
-            
-            Consola consola=new Consola(id, nombre);
+
+            Consola consola = new Consola(id, nombre);
             consolas.add(consola);
         }
-        
+
         elStatementPreparado.close();
         elResultado.close();
-        
+
         return consolas;
     }
-    
+
     public Consola infoConsolaModificar(int id) throws Exception {
-        int idConsola =0;
-        String nombre="";
-        String potenciaCpu="";
-        String potenciaGpu="";
-        String compania="";
-        int precio=0;
-        int unidades=0;
-        int generacion=0;
-            
+        int idConsola = 0;
+        String nombre = "";
+        String potenciaCpu = "";
+        String potenciaGpu = "";
+        String compania = "";
+        int precio = 0;
+        int unidades = 0;
+        int generacion = 0;
+
         String consulta = "SELECT * FROM consolas WHERE id_consola=?;";
-        
+
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta);
-        
+
         elStatementPreparado.setInt(1, id);
 
         ResultSet elResultado = elStatementPreparado.executeQuery();
-        
+
         while (elResultado.next()) {
             idConsola = elResultado.getInt("id_consola");
             nombre = elResultado.getString("nombre");
@@ -237,15 +233,14 @@ public class Conexion {
             generacion = elResultado.getInt("generacion");
         }
         Consola consola1 = new Consola(idConsola, nombre, potenciaCpu, potenciaGpu, compania, precio, unidades, generacion);
-        
+
         elStatementPreparado.close();
         elResultado.close();
-    
+
         return consola1;
     }
-    
-    
-    public void modificarConsola(Consola consola) throws Exception{
+
+    public void modificarConsola(Consola consola) throws Exception {
         String consulta = "UPDATE consolas SET nombre=?, potencia_cpu=?, potencia_gpu=?, compania=?, precio=?, unidades=?, generacion=? WHERE id_consola=?;";
 
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta);
@@ -257,56 +252,54 @@ public class Conexion {
         elStatementPreparado.setInt(5, consola.getPrecio());
         elStatementPreparado.setInt(6, consola.getUnidades());
         elStatementPreparado.setInt(7, consola.getGeneracion());
-        
+
         elStatementPreparado.executeUpdate();
-        
+
         elStatementPreparado.close();
-   
+
     }
-    
-    
-    public ArrayList<Juego> obtenerNombreJuegos() throws SQLException{
+
+    public ArrayList<Juego> obtenerNombreJuegos() throws SQLException {
         ArrayList<Juego> juegos = new ArrayList<>();
-         
+
         String consulta = "SELECT id_juego, nombre nombre FROM juegos";
-        
+
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta,
                 ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        
+
         ResultSet elResultado = elStatementPreparado.executeQuery();
-        
+
         while (elResultado.next()) {
             int id = elResultado.getInt("id_juego");
             String nombre = elResultado.getString("nombre");
-            
-            Juego juego=new Juego(id, nombre);
+
+            Juego juego = new Juego(id, nombre);
             juegos.add(juego);
         }
-        
+
         elStatementPreparado.close();
         elResultado.close();
-        
+
         return juegos;
     }
-   
-    
+
     public Juego infoJuegoModificar(int id) throws Exception {
-        int idJuego =0;
-        String nombre="";
-        String compania="";
-        String genero="";
-        int puntuacion=0;
-        int precio=0;
-        int unidades=0;
-            
+        int idJuego = 0;
+        String nombre = "";
+        String compania = "";
+        String genero = "";
+        int puntuacion = 0;
+        int precio = 0;
+        int unidades = 0;
+
         String consulta = "SELECT * FROM juegos WHERE id_juego=?;";
-        
+
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta);
-        
+
         elStatementPreparado.setInt(1, id);
 
         ResultSet elResultado = elStatementPreparado.executeQuery();
-        
+
         while (elResultado.next()) {
             idJuego = elResultado.getInt("id_juego");
             nombre = elResultado.getString("nombre");
@@ -316,17 +309,16 @@ public class Conexion {
             precio = elResultado.getInt("precio");
             unidades = elResultado.getInt("unidades_disponibles");
         }
-        
-        Juego juego =new Juego(id, nombre, compania, genero, puntuacion, precio, unidades);
-        
+
+        Juego juego = new Juego(id, nombre, compania, genero, puntuacion, precio, unidades);
+
         elStatementPreparado.close();
         elResultado.close();
-    
+
         return juego;
     }
-    
-    
-    public void modificarJuego(Juego juego) throws Exception{
+
+    public void modificarJuego(Juego juego) throws Exception {
         String consulta = "UPDATE juegos SET nombre=?, compania_desarrolladora=?, genero=?, puntuacion_metacritic=?, precio=?, unidades_disponibles=? WHERE id_juego=?;";
 
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta);
@@ -337,41 +329,34 @@ public class Conexion {
         elStatementPreparado.setInt(5, juego.getPrecio());
         elStatementPreparado.setInt(6, juego.getUnidades());
         elStatementPreparado.setInt(7, juego.getId());
-        
+
         elStatementPreparado.executeUpdate();
-        
+
         elStatementPreparado.close();
-   
+
     }
-   
-    public void eliminarConsola(Consola consola) throws Exception{
+
+    public void eliminarConsola(Consola consola) throws Exception {
         String consulta = "DELETE FROM consolas WHERE id_consola = ?";
 
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta);
         elStatementPreparado.setInt(1, consola.getIdConsola());
-        
+
         elStatementPreparado.executeUpdate();
-        
+
         elStatementPreparado.close();
     }
-    
-    
-    public void eliminarJuego(Juego juego) throws Exception{
+
+    public void eliminarJuego(Juego juego) throws Exception {
         String consulta = "DELETE FROM juegos WHERE id_juego = ?";
-        
+
         PreparedStatement elStatementPreparado = this.laConexion.prepareStatement(consulta);
         elStatementPreparado.setInt(1, juego.getId());
-        
+
         elStatementPreparado.executeUpdate();
-        
+
         elStatementPreparado.close();
-   
+
     }
-   
 
 }
-
-    
-    
-    
-
